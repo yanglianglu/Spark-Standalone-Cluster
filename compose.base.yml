@@ -1,0 +1,50 @@
+x-spark-common-env: &spark-common-env
+  SPARK_NO_DAEMONIZE: "true"
+  SPARK_LOG_JSON: "true"
+
+x-spark-base: &spark-base
+  image: ${SPARK_IMAGE}
+  restart: unless-stopped
+  networks:
+    - spark-net
+
+x-spark-command-connect: &spark-command-connect
+  - /opt/bitnami/spark/sbin/start-connect-server.sh
+  - --master
+  - spark://spark-master:7077
+  - --conf
+  - spark.ui.enabled=true
+  - --conf
+  - spark.sql.warehouse.dir=file:${IN_DOCKER_DATA}/warehouse
+  - --conf
+  - spark.sql.catalogImplementation=in-memory
+
+x-resources-master: &resources-master
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 2g
+
+x-resources-worker: &resources-worker
+  resources:
+    limits:
+      cpus: "2.0"
+      memory: 4g
+
+x-resources-connect: &resources-connect
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 2g
+
+x-resources-history: &resources-history
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 2g
+
+networks:
+  spark-net:
+
+volumes:
+  ${EVENTS_VOLUME}:

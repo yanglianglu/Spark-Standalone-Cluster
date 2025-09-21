@@ -1,0 +1,17 @@
+services:
+  spark-history:
+    <<: *spark-base
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: history-server
+      SPARK_HISTORY_SERVER_LOG_DIR: "file:/opt/spark/events"
+      SPARK_HISTORY_SERVER_PORT_NUMBER: "18080"
+    ports:
+      - "${HISTORY_UI_PORT}:18080"
+    volumes:
+      - ${EVENTS_VOLUME}:/opt/spark/events
+      - ./spark/conf:/opt/bitnami/spark/conf:ro
+    deploy: *resources-history

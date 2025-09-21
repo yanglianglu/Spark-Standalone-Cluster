@@ -1,0 +1,6 @@
+# Local Spark artifacts
+__pycache__/
+data/warehouse/
+data/metastore_db/
+spark/logs/
+spark/work/

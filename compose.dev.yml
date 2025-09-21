@@ -1,0 +1,27 @@
+services:
+  spark-master:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      SPARK_LOG_LEVEL: INFO
+
+  spark-worker:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      SPARK_WORKER_LOG_LEVEL: INFO
+
+  spark-connect:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      SPARK_CONNECT_LOG_LEVEL: INFO

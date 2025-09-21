@@ -1,0 +1,56 @@
+services:
+  spark-master:
+    <<: *spark-base
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: master
+      SPARK_EVENTLOG_ENABLED: "true"
+      SPARK_EVENTLOG_DIR: "file:/opt/spark/events"
+    ports:
+      - "${MASTER_UI_PORT}:8080"
+      - "7077:7077"
+    volumes:
+      - ${EVENTS_VOLUME}:/opt/spark/events
+      - ./spark/conf:/opt/bitnami/spark/conf:ro
+      - ${HOST_DATA_DIR}:${IN_DOCKER_DATA}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy: *resources-master
+
+  spark-worker:
+    <<: *spark-base
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_CORES: "${WORKER_CORES}"
+      SPARK_WORKER_MEMORY: "${WORKER_MEMORY}"
+    ports:
+      - "${WORKER_UI_PORT}:8081"
+    volumes:
+      - ./spark/conf:/opt/bitnami/spark/conf:ro
+      - ${HOST_DATA_DIR}:${IN_DOCKER_DATA}
+    deploy: *resources-worker
+
+  spark-connect:
+    <<: *spark-base
+    depends_on:
+      spark-master:
+        condition: service_healthy
+    command: *spark-command-connect
+    environment:
+      <<: *spark-common-env
+    ports:
+      - "${CONNECT_GRPC_PORT}:15002"
+      - "${CONNECT_UI_PORT}:4040"
+    volumes:
+      - ./spark/conf:/opt/bitnami/spark/conf:ro
+      - ${HOST_DATA_DIR}:${IN_DOCKER_DATA}
+    deploy: *resources-connect
