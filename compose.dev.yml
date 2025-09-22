@@ -1,4 +1,9 @@
 services:
+  jupyter:
+    extends:
+      file: compose.jupyter.yml
+      service: jupyter
+
   spark-master:
     logging:
       driver: json-file

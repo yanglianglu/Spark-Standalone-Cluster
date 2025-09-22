@@ -1,0 +1,11 @@
+services:
+  jupyter:
+    build:
+      context: ./jupyter
+    ports:
+      - "${JUPYTER_PORT}:8888"
+    volumes:
+      - ${HOST_DATA_DIR}:${IN_DOCKER_DATA}
+    networks:
+      - spark-net
+    user: "0"
